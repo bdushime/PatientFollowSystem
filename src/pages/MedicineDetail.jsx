@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PatternBackground from '../components/ui/PatternBackground'
 
 export default function MedicineDetail({
   drugName,
@@ -13,7 +14,8 @@ export default function MedicineDetail({
 
   return (
     <div className="w-72 rounded-3xl overflow-hidden shadow-md bg-surface">
-      <div className="relative bg-accent pt-4 pb-6 px-4 flex flex-col items-center">
+      <div className="relative overflow-hidden bg-accent pt-4 pb-6 px-4 flex flex-col items-center">
+        <PatternBackground color="white" className="opacity-25" />
         <button
           onClick={onBack}
           aria-label="Back"
@@ -24,7 +26,7 @@ export default function MedicineDetail({
         <img
           src={image}
           alt={drugName}
-          className="w-28 h-36 object-contain mt-6"
+          className="relative w-28 h-36 object-contain mt-6"
         />
       </div>
 

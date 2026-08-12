@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PatternBackground from '../ui/PatternBackground'
 
 export default function DoseChecklist({
   drugName,
@@ -9,14 +10,21 @@ export default function DoseChecklist({
   timesTaken,
   timesTotal,
   onClose,
+  onOpenDetail,
 }) {
   const [taken, setTaken] = useState(false)
 
   return (
-    <div className="w-80 rounded-3xl overflow-hidden shadow-md bg-surface">
-      <div className="relative bg-accent-soft mx-4 mt-4 rounded-2xl px-4 pt-4 pb-4">
+    <div className="w-full rounded-3xl overflow-hidden shadow-md bg-surface">
+      <div
+        onClick={onOpenDetail}
+        className={`relative bg-accent-soft mx-4 mt-4 rounded-2xl px-4 pt-4 pb-4 ${onOpenDetail ? 'cursor-pointer' : ''}`}
+      >
         <button
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation()
+            onClose?.()
+          }}
           aria-label="Close"
           className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center text-text-secondary cursor-pointer"
         >
@@ -30,14 +38,16 @@ export default function DoseChecklist({
         <div className="flex items-center justify-between gap-3">
           <p className="text-text-primary font-semibold text-lg">{drugName}</p>
           <button
-            onClick={() => setTaken(true)}
+            onClick={(e) => {
+              e.stopPropagation()
+              setTaken(true)
+            }}
             disabled={taken}
-            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white cursor-pointer disabled:cursor-not-allowed shrink-0 ${
-              taken ? 'bg-success' : 'bg-accent hover:bg-accent-hover'
-            }`}
+            className="relative overflow-hidden inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white cursor-pointer disabled:cursor-not-allowed shrink-0 bg-accent hover:bg-accent-hover disabled:hover:bg-accent"
           >
-            <span aria-hidden="true">✓</span>
-            {taken ? 'Taken' : 'Mark as taken'}
+            {!taken && <PatternBackground color="white" className="opacity-25" />}
+            <span className="relative" aria-hidden="true">✓</span>
+            <span className="relative">{taken ? 'Taken' : 'Mark as taken'}</span>
           </button>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import PatternBackground from './PatternBackground'
+
 const styles = {
   primary: 'bg-accent text-white hover:bg-accent-hover disabled:opacity-40',
   secondary:
@@ -13,10 +15,11 @@ export default function Button({
 }) {
   return (
     <button
-      className={`rounded-xl px-5 py-3 text-sm font-semibold cursor-pointer disabled:cursor-not-allowed transition-colors ${styles[variant]} ${className}`}
+      className={`relative overflow-hidden rounded-xl px-5 py-3 text-sm font-semibold cursor-pointer disabled:cursor-not-allowed transition-colors ${styles[variant]} ${className}`}
       {...props}
     >
-      {children}
+      {variant === 'primary' && <PatternBackground color="white" className="opacity-25" />}
+      <span className="relative">{children}</span>
     </button>
   )
 }

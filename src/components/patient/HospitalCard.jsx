@@ -1,5 +1,5 @@
 const STATUS_TEXT = {
-  approved: { className: 'text-success', label: 'Approved' },
+  approved: { className: 'text-accent', label: 'Approved' },
   pending: { className: 'text-warning', label: 'Pending approval' },
 }
 

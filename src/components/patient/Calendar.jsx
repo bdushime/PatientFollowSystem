@@ -61,9 +61,9 @@ export default function Calendar({
   const days = buildCalendarDays(year, month)
 
   return (
-    <div className="w-full bg-surface border border-border rounded-2xl shadow-sm p-4">
+    <div className="w-full bg-surface border border-border rounded-2xl shadow-sm p-5 md:p-7">
       <div className="flex items-center justify-between">
-        <button className="flex items-center gap-1.5 text-text-primary font-semibold cursor-pointer">
+        <button className="flex items-center gap-1.5 text-text-primary font-semibold text-base md:text-lg cursor-pointer">
           {MONTH_NAMES[month]} {year}
           <span className="text-text-secondary text-sm" aria-hidden="true">⌄</span>
         </button>
@@ -71,34 +71,34 @@ export default function Calendar({
           <button
             onClick={onPrevMonth}
             aria-label="Previous month"
-            className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-text-secondary cursor-pointer hover:border-black/20"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-border flex items-center justify-center text-text-secondary cursor-pointer hover:border-black/20"
           >
             ‹
           </button>
           <button
             onClick={onNextMonth}
             aria-label="Next month"
-            className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-text-secondary cursor-pointer hover:border-black/20"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-border flex items-center justify-center text-text-secondary cursor-pointer hover:border-black/20"
           >
             ›
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 mt-4 text-center">
+      <div className="grid grid-cols-7 mt-5 text-center">
         {WEEKDAYS.map((weekday) => (
-          <p key={weekday} className="text-text-muted text-xs font-semibold">
+          <p key={weekday} className="text-text-muted text-xs md:text-sm font-semibold">
             {weekday}
           </p>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 mt-1 gap-y-1 text-center">
+      <div className="grid grid-cols-7 mt-2 gap-y-2 text-center">
         {days.map((day, index) => (
           <button
             key={index}
             onClick={() => day.isCurrentMonth && onSelectDay(day.dayNumber)}
-            className={`h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer ${getDayButtonStyle(day, selectedDay)}`}
+            className={`h-10 w-10 md:h-12 md:w-12 mx-auto flex items-center justify-center rounded-full text-sm md:text-base cursor-pointer ${getDayButtonStyle(day, selectedDay)}`}
           >
             {day.dayNumber}
           </button>
