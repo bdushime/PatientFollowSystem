@@ -1,6 +1,6 @@
 export default function Navbar({ items, activeItem, onSelect }) {
   return (
-    <nav className="inline-flex items-center gap-1 bg-surface border border-border rounded-full p-1.5 shadow-sm">
+    <nav className="max-w-full inline-flex items-center gap-1 bg-surface border border-border rounded-full p-1.5 shadow-sm overflow-x-auto">
       {items.map((item) => {
         const isActive = item === activeItem
 
@@ -10,8 +10,8 @@ export default function Navbar({ items, activeItem, onSelect }) {
             onClick={() => onSelect?.(item)}
             className={
               isActive
-                ? 'bg-accent text-white rounded-full px-5 py-2 text-sm font-semibold cursor-pointer'
-                : 'text-text-secondary px-5 py-2 text-sm font-medium cursor-pointer hover:text-text-primary'
+                ? 'shrink-0 whitespace-nowrap bg-accent text-white rounded-full px-3 sm:px-5 py-2 text-xs sm:text-sm font-semibold cursor-pointer'
+                : 'shrink-0 whitespace-nowrap text-text-secondary px-3 sm:px-5 py-2 text-xs sm:text-sm font-medium cursor-pointer hover:text-text-primary'
             }
           >
             {item}
