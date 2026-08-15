@@ -6,6 +6,7 @@ import DoseChecklist from '../components/patient/DoseChecklist'
 import DoseScheduleItem from '../components/patient/DoseScheduleItem'
 import Calendar from '../components/patient/Calendar'
 import TalkToAIBadge from '../components/patient/TalkToAIBadge'
+import Navbar from '../components/ui/Navbar'
 
 export default function Dashboard({
   patientName,
@@ -19,6 +20,7 @@ export default function Dashboard({
 }) {
   const [{ year, month }, setCursor] = useState({ year: 2022, month: 4 })
   const [selectedDay, setSelectedDay] = useState(10)
+  const [activeNavItem,setActiveNavItem] = useState('Home')
 
   const goPrevMonth = () =>
     setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))
@@ -27,6 +29,9 @@ export default function Dashboard({
 
   return (
     <div className="bg-bg min-h-svh">
+      <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-center lg:justify-start">
+         <Navbar items={['Home','Prescriptions','Hospitals','MindSpace']} activeItem={activeNavItem} onSelect={setActiveNavItem}/>
+      </div>
       <div className="relative overflow-hidden bg-bg px-5 md:px-10 lg:px-16 pt-8 md:pt-14">
         <PatternBackground color="accent" className="opacity-5" />
         <div className="relative max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
@@ -53,7 +58,7 @@ export default function Dashboard({
 
             <div className="flex items-center gap-6 mt-6 md:mt-8">
               <p className="text-text-secondary text-sm md:text-base max-w-xs">
-                Your prescriptions, dose reminders, and AI check-ins — all in one place, built
+                Your prescriptions, dose reminders, and AI check-ins all in one place, built
                 around your care.
               </p>
               <TalkToAIBadge onClick={onTalkToAI} />
@@ -111,7 +116,7 @@ export default function Dashboard({
 
       <div className="max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8">
         <Button variant="ghost" className="w-full lg:w-auto" onClick={onTalkToAI}>
-          Talk to AI
+          Mind Space
         </Button>
       </div>
     </div>
