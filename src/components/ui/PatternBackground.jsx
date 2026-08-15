@@ -11,13 +11,13 @@ export default function PatternBackground({ color = 'accent', className = '' }) 
       style={{
         maskImage: 'url(/background-removebg-preview.png)',
         maskMode: 'alpha',
-        maskSize: 'cover',
+        maskSize: '700px 467px',
         maskPosition: 'center',
-        maskRepeat: 'no-repeat',
+        maskRepeat: 'repeat',
         WebkitMaskImage: 'url(/background-removebg-preview.png)',
-        WebkitMaskSize: 'cover',
+        WebkitMaskSize: '700px 467px',
         WebkitMaskPosition: 'center',
-        WebkitMaskRepeat: 'no-repeat',
+        WebkitMaskRepeat: 'repeat',
       }}
     />
   )

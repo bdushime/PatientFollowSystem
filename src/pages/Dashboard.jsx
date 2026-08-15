@@ -28,12 +28,11 @@ export default function Dashboard({
 
   return (
     <div className="relative overflow-hidden bg-bg min-h-svh">
-      <PatternBackground color="accent" className="opacity-5"/>
+      <PatternBackground color="accent" className="opacity-10"/>
       <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-center lg:justify-start">
          <Navbar items={['Home','Prescriptions','Hospitals','MindSpace']} activeItem={activeNavItem} onSelect={setActiveNavItem}/>
       </div>
-      <div className="relative overflow-hidden bg-bg px-5 md:px-10 lg:px-16 pt-8 md:pt-14">
-        {/* <PatternBackground color="accent" className="opacity-5" /> */}
+      <div className="relative overflow-hidden px-5 md:px-10 lg:px-16 pt-8 md:pt-14">
         <div className="relative max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
           <div>
             <span className="inline-block bg-accent-soft text-accent text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-1">
@@ -114,7 +113,7 @@ export default function Dashboard({
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8">
+      <div className="relative max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8">
         <Button variant="ghost" className="w-full lg:w-auto" onClick={onTalkToAI}>
           Mind Space
         </Button>
