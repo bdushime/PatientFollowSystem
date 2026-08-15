@@ -5,7 +5,6 @@ import Card from '../components/ui/Card'
 import DoseChecklist from '../components/patient/DoseChecklist'
 import DoseScheduleItem from '../components/patient/DoseScheduleItem'
 import Calendar from '../components/patient/Calendar'
-import TalkToAIBadge from '../components/patient/TalkToAIBadge'
 import Navbar from '../components/ui/Navbar'
 
 export default function Dashboard({
@@ -28,12 +27,13 @@ export default function Dashboard({
     setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }))
 
   return (
-    <div className="bg-bg min-h-svh">
+    <div className="relative overflow-hidden bg-bg min-h-svh">
+      <PatternBackground color="accent" className="opacity-5"/>
       <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-center lg:justify-start">
          <Navbar items={['Home','Prescriptions','Hospitals','MindSpace']} activeItem={activeNavItem} onSelect={setActiveNavItem}/>
       </div>
       <div className="relative overflow-hidden bg-bg px-5 md:px-10 lg:px-16 pt-8 md:pt-14">
-        <PatternBackground color="accent" className="opacity-5" />
+        {/* <PatternBackground color="accent" className="opacity-5" /> */}
         <div className="relative max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
           <div>
             <span className="inline-block bg-accent-soft text-accent text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-1">
@@ -61,7 +61,6 @@ export default function Dashboard({
                 Your prescriptions, dose reminders, and AI check-ins all in one place, built
                 around your care.
               </p>
-              <TalkToAIBadge onClick={onTalkToAI} />
             </div>
           </div>
 
@@ -87,6 +86,7 @@ export default function Dashboard({
                 {...medication}
                 onOpenDetail={() => onSelectMedicine?.(medication)}
               />
+              
             ))}
           </div>
         </div>

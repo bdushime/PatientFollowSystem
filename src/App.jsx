@@ -14,6 +14,24 @@ function App() {
       time:'2:00 PM',
       timesTaken:1,
       timesTotal:3,
+    },
+    {
+      drugName: '',
+      image:'/tablet.png',
+      dose:'1',
+      doseUnit:'capsule',
+      time:'5:00 PM',
+      timesTaken:1,
+      timesTotal:3,
+    },
+     {
+      drugName: '',
+      image:'/tablet.png',
+      dose:'1',
+      doseUnit:'capsule',
+      time:'5:00 PM',
+      timesTaken:1,
+      timesTotal:3,
     }
   ]
 
