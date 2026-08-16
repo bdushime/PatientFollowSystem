@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { mockPatients } from '../../data/mockDoctorData'
 import Card from '../../components/ui/Card'
@@ -18,6 +18,18 @@ export default function PatientDetail() {
   const [{ year, month }, setCursor] = useState({ year: 2026, month: 7 })
   const [selectedDay, setSelectedDay] = useState(16)
   const [showForm, setShowForm] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  useEffect(() => {
+    if (!showSuccess) return
+    const timer = setTimeout(() => setShowSuccess(false), 3000)
+    return () => clearTimeout(timer)
+  }, [showSuccess])
+
+  const handlePrescriptionSubmit = () => {
+    setShowForm(false)
+    setShowSuccess(true)
+  }
 
   const goPrevMonth = () =>
     setCursor((c) =>
@@ -137,13 +149,27 @@ export default function PatientDetail() {
             </Card>
 
             {/* Write Prescription */}
-            {showForm ? (
+            {showSuccess && (
+              <div className="flex items-start gap-3 bg-success-soft border border-success/30 rounded-2xl px-4 py-4">
+                <span className="text-success text-xl shrink-0 mt-0.5">✓</span>
+                <div>
+                  <p className="text-success font-semibold text-sm">Prescription saved</p>
+                  <p className="text-text-secondary text-sm mt-0.5">
+                    The patient's prescription has been updated successfully.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {showForm && (
               <WritePrescriptionForm
                 patientId={patient.id}
                 onCancel={() => setShowForm(false)}
-                onSubmit={() => setShowForm(false)}
+                onSubmit={handlePrescriptionSubmit}
               />
-            ) : (
+            )}
+
+            {!showForm && !showSuccess && (
               <Button variant="primary" className="w-full" onClick={() => setShowForm(true)}>
                 + Write New Prescription
               </Button>
