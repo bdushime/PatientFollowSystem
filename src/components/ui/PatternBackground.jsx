@@ -7,7 +7,7 @@ export default function PatternBackground({ color = 'accent', className = '' }) 
   return (
     <div
       aria-hidden="true"
-      className={`absolute inset-0 ${COLOR_CLASSES[color]} ${className}`}
+      className={`absolute inset-0 pointer-events-none ${COLOR_CLASSES[color]} ${className}`}
       style={{
         maskImage: 'url(/background-removebg-preview.png)',
         maskMode: 'alpha',

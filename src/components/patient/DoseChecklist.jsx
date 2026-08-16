@@ -52,17 +52,17 @@ export default function DoseChecklist({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 divide-x divide-border mt-4 px-4 pb-4 pt-3">
-        <div className="text-center">
-          <p className="text-text-primary font-semibold">{dose}</p>
+      <div className="grid grid-cols-3 divide-x divide-border mt-4 px-2 pb-4 pt-3">
+        <div className="text-center px-1">
+          <p className="text-text-primary font-semibold text-sm whitespace-nowrap">{dose}</p>
           <p className="text-text-secondary text-xs mt-0.5">Dose, {doseUnit}</p>
         </div>
-        <div className="text-center">
-          <p className="text-text-primary font-semibold">{time}</p>
+        <div className="text-center px-1">
+          <p className="text-text-primary font-semibold text-sm whitespace-nowrap">{time}</p>
           <p className="text-text-secondary text-xs mt-0.5">Time to take</p>
         </div>
-        <div className="text-center">
-          <p className="text-text-primary font-semibold">
+        <div className="text-center px-1">
+          <p className="text-text-primary font-semibold text-sm whitespace-nowrap">
             {timesTaken}/{timesTotal}
           </p>
           <p className="text-text-secondary text-xs mt-0.5">Number of times</p>

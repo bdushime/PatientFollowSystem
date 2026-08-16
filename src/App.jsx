@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import Navbar from './components/ui/Navbar'
 import Dashboard from './pages/Dashboard'
+import AIChat from './pages/AIChat'
 
 function App() {
   const [activeItem, setActiveItem] = useState('Home')
+  const [showChat, setShowChat] = useState(false)
 
   const medications = [
     {
@@ -45,6 +47,10 @@ function App() {
     }
   ]
 
+  if (showChat) {
+    return <AIChat onBack={() => setShowChat(false)} />
+  }
+
   return (
     <div className=" bg-bg flex items-center justify-center p-8">
       {/* <Navbar
@@ -52,7 +58,7 @@ function App() {
         activeItem={activeItem}
         onSelect={setActiveItem}
       /> */}
-      <Dashboard patientName="John" hospitalName="City General Hospital" doctorName="Dr. Beni" hospitalPatientId="CGH-4821" medications={medications} schedule={schedule} onTalkToAI={()=>console.log('Open Mind Space')} onSelectMedicine={(medecine)=>console.log('open detail')}/>
+      <Dashboard patientName="John" hospitalName="City General Hospital" doctorName="Dr. Beni" hospitalPatientId="CGH-4821" medications={medications} schedule={schedule} onTalkToAI={()=>setShowChat(true)} onSelectMedicine={(medecine)=>console.log('open detail')}/>
     </div>
   )
 }

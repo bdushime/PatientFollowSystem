@@ -6,6 +6,7 @@ import DoseChecklist from '../components/patient/DoseChecklist'
 import DoseScheduleItem from '../components/patient/DoseScheduleItem'
 import Calendar from '../components/patient/Calendar'
 import Navbar from '../components/ui/Navbar'
+import MobileNav from '../components/ui/MobileNav'
 
 export default function Dashboard({
   patientName,
@@ -29,8 +30,21 @@ export default function Dashboard({
   return (
     <div className="relative overflow-hidden bg-bg min-h-svh">
       <PatternBackground color="accent" className="opacity-10"/>
-      <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-center lg:justify-start">
-         <Navbar items={['Home','Prescriptions','Hospitals','MindSpace']} activeItem={activeNavItem} onSelect={setActiveNavItem}/>
+      <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-between lg:justify-start items-center">
+        <div className="hidden lg:block">
+          <Navbar
+            items={['Home', 'Prescriptions', 'Hospitals', 'MindSpace']}
+            activeItem={activeNavItem}
+            onSelect={setActiveNavItem}
+          />
+        </div>
+        <div className="lg:hidden">
+          <MobileNav
+            items={['Home', 'Prescriptions', 'Hospitals', 'MindSpace']}
+            activeItem={activeNavItem}
+            onSelect={setActiveNavItem}
+          />
+        </div>
       </div>
       <div className="relative overflow-hidden px-5 md:px-10 lg:px-16 pt-8 md:pt-14">
         <div className="relative max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
