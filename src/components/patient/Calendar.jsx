@@ -50,6 +50,15 @@ function getDayButtonStyle(day, selectedDay) {
   return 'text-text-muted'
 }
 
+function getDotColor(isSelected, status) {
+  if (isSelected) return 'bg-white/80'
+  if (status === 'taken') return 'bg-success'
+  if (status === 'missed') return 'bg-warning'
+  return ''
+}
+
+// markedDays is optional: { [dayNumber]: 'taken' | 'missed' }
+// When not passed (patient side), calendar looks exactly the same as before.
 export default function Calendar({
   year,
   month,
@@ -57,8 +66,10 @@ export default function Calendar({
   onSelectDay,
   onPrevMonth,
   onNextMonth,
+  markedDays = {},
 }) {
   const days = buildCalendarDays(year, month)
+  const hasDots = Object.keys(markedDays).length > 0
 
   return (
     <div className="w-full bg-surface border border-border rounded-2xl shadow-sm p-5 md:p-7">
@@ -93,17 +104,52 @@ export default function Calendar({
         ))}
       </div>
 
-      <div className="grid grid-cols-7 mt-2 gap-y-2 text-center">
-        {days.map((day, index) => (
-          <button
-            key={index}
-            onClick={() => day.isCurrentMonth && onSelectDay(day.dayNumber)}
-            className={`h-10 w-10 md:h-12 md:w-12 mx-auto flex items-center justify-center rounded-full text-sm md:text-base cursor-pointer ${getDayButtonStyle(day, selectedDay)}`}
-          >
-            {day.dayNumber}
-          </button>
-        ))}
+      <div className="grid grid-cols-7 mt-2 gap-y-1 text-center">
+        {days.map((day, index) => {
+          const status = day.isCurrentMonth ? markedDays[day.dayNumber] : undefined
+          const isSelected = day.isCurrentMonth && day.dayNumber === selectedDay
+
+          if (!hasDots) {
+            return (
+              <button
+                key={index}
+                onClick={() => day.isCurrentMonth && onSelectDay(day.dayNumber)}
+                className={`h-10 w-10 md:h-12 md:w-12 mx-auto flex items-center justify-center rounded-full text-sm md:text-base cursor-pointer ${getDayButtonStyle(day, selectedDay)}`}
+              >
+                {day.dayNumber}
+              </button>
+            )
+          }
+
+          return (
+            <div key={index} className="flex flex-col items-center gap-0.5">
+              <button
+                onClick={() => day.isCurrentMonth && onSelectDay(day.dayNumber)}
+                className={`h-9 w-9 md:h-10 md:w-10 mx-auto flex items-center justify-center rounded-full text-sm md:text-base cursor-pointer ${getDayButtonStyle(day, selectedDay)}`}
+              >
+                {day.dayNumber}
+              </button>
+              {/* Always render the dot slot to keep row heights consistent */}
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${status ? getDotColor(isSelected, status) : ''}`}
+              />
+            </div>
+          )
+        })}
       </div>
+
+      {hasDots && (
+        <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-success" />
+            <span className="text-text-muted text-xs">Taken</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-warning" />
+            <span className="text-text-muted text-xs">Missed</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
