@@ -60,7 +60,7 @@ export default function Dashboard({
         <div className="relative max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
           <div>
             <span className="inline-block bg-accent-soft text-accent text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-1">
-              [ {hospitalName} ]
+               {hospitalName} 
             </span>
             <p className="text-text-primary font-extrabold text-4xl md:text-6xl lg:text-7xl leading-[0.95] mt-4">
               Welcome,
