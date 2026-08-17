@@ -1,3 +1,8 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import EntryPage from './pages/EntryPage'
+import PatientRoot from './pages/PatientRoot'
+import DoctorDashboard from './pages/doctor/DoctorDashboard'
+import PatientDetail from './pages/doctor/PatientDetail'
 import { useState } from 'react'
 import HospitalList from './pages/HospitalList'
 import Dashboard from './pages/Dashboard'
@@ -89,7 +94,17 @@ function App() {
     )
   }
 
+export default function App() {
   return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<EntryPage />} />
+        <Route path="/patient/*" element={<PatientRoot />} />
+        <Route path="/doctor" element={<DoctorDashboard />} />
+        <Route path="/doctor/patient/:id" element={<PatientDetail />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
     <HospitalList
       patientName="John"
       hospitals={hospitals}
@@ -99,5 +114,3 @@ function App() {
     />
   )
 }
-
-export default App

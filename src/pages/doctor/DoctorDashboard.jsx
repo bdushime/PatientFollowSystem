@@ -1,0 +1,97 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Navbar from '../../components/ui/Navbar'
+import MobileNav from '../../components/ui/MobileNav'
+import PatternBackground from '../../components/ui/PatternBackground'
+import PatientCard from '../../components/doctor/PatientCard'
+import { mockDoctor, mockPatients } from '../../data/mockDoctorData'
+
+const NAV_ITEMS = ['Patients']
+
+export default function DoctorDashboard() {
+  const [activeNavItem, setActiveNavItem] = useState('Patients')
+  const navigate = useNavigate()
+
+  const alertCount = mockPatients.filter((p) => p.hasAlert).length
+
+  return (
+    <div className="relative overflow-hidden bg-bg min-h-svh">
+      <PatternBackground color="accent" className="opacity-10" />
+
+      {/* Navbar */}
+      <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-between lg:justify-start items-center">
+        <div className="hidden lg:block">
+          <Navbar
+            items={NAV_ITEMS}
+            activeItem={activeNavItem}
+            onSelect={setActiveNavItem}
+          />
+        </div>
+        <div className="lg:hidden">
+          <MobileNav
+            items={NAV_ITEMS}
+            activeItem={activeNavItem}
+            onSelect={setActiveNavItem}
+          />
+        </div>
+      </div>
+
+      {/* Hero */}
+      <div className="relative px-5 md:px-10 lg:px-16 pt-8 md:pt-14">
+        <div className="relative max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
+          <div>
+            <span className="inline-block bg-accent-soft text-accent text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-1">
+              City General Hospital
+            </span>
+            <p className="text-text-primary font-extrabold text-4xl md:text-6xl lg:text-7xl leading-[0.95] mt-4">
+              Welcome,
+            </p>
+            <p className="text-accent font-extrabold text-5xl md:text-7xl lg:text-8xl leading-[0.95]">
+              {mockDoctor.name}
+            </p>
+            <p className="text-text-secondary text-sm md:text-base mt-3">
+              {mockDoctor.specialty}
+            </p>
+
+            {alertCount > 0 && (
+              <div className="inline-flex items-center gap-2 mt-5 bg-warning-soft border border-warning/30 rounded-2xl px-4 py-3">
+                <span className="text-warning font-bold text-lg">⚠</span>
+                <p className="text-warning font-semibold text-sm">
+                  {alertCount} patient{alertCount > 1 ? 's require' : ' requires'} your attention today.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-center lg:justify-end">
+            <img
+              src="/doc.jpg"
+              alt="Doctor"
+              className="w-56 md:w-80 lg:w-[26rem] h-auto object-cover object-top rounded-3xl"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Patient List */}
+      <div className="relative max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 pt-8 pb-12">
+        <p className="text-text-primary font-semibold text-lg md:text-xl mb-5">
+          Your Patients
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {mockPatients.map((patient) => (
+            <PatientCard
+              key={patient.id}
+              name={patient.name}
+              condition={patient.condition}
+              hospitalPatientId={patient.hospitalPatientId}
+              adherenceRate={patient.adherenceRate}
+              hasAlert={patient.hasAlert}
+              onClick={() => navigate(`/doctor/patient/${patient.id}`)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
