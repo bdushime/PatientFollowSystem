@@ -1,6 +1,24 @@
 import { useState } from 'react'
 import PatternBackground from '../ui/PatternBackground'
 
+function parseTime(timeStr) {
+  const [, hourStr, minuteStr, period] = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i) || []
+  let hours24 = parseInt(hourStr, 10) % 12
+  if (/pm/i.test(period)) hours24 += 12
+  return { hours24, minutes: parseInt(minuteStr, 10) }
+}
+
+function formatTime({ hours24, minutes }) {
+  const period = hours24 >= 12 ? 'PM' : 'AM'
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12
+  return `${hours12}:${String(minutes).padStart(2, '0')} ${period}`
+}
+
+function getNextIntakeTime(timeStr, intervalHours) {
+  const { hours24, minutes } = parseTime(timeStr)
+  return formatTime({ hours24: (hours24 + intervalHours) % 24, minutes })
+}
+
 export default function DoseChecklist({
   drugName,
   image = '/tablet.png',
@@ -9,12 +27,14 @@ export default function DoseChecklist({
   time,
   timesTaken,
   timesTotal,
+  intervalHours = 12,
   onClose,
   onOpenDetail,
 }) {
   const [taken, setTaken] = useState(false)
 
   const displayedTimesTaken = taken ? Math.min(timesTaken + 1, timesTotal) : timesTaken
+  const displayedTime = taken ? getNextIntakeTime(time, intervalHours) : time
 
   return (
     <div className="w-full rounded-3xl overflow-hidden shadow-md bg-surface">
@@ -60,8 +80,8 @@ export default function DoseChecklist({
           <p className="text-text-secondary text-xs mt-0.5">Dose, {doseUnit}</p>
         </div>
         <div className="text-center px-1">
-          <p className="text-text-primary font-semibold text-sm whitespace-nowrap">{time}</p>
-          <p className="text-text-secondary text-xs mt-0.5">{taken ? 'Taken at' : 'Time to take'}</p>
+          <p className="text-text-primary font-semibold text-sm whitespace-nowrap">{displayedTime}</p>
+          <p className="text-text-secondary text-xs mt-0.5">Time to take</p>
         </div>
         <div className="text-center px-1">
           <p className="text-text-primary font-semibold text-sm whitespace-nowrap">
