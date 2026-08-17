@@ -17,10 +17,11 @@ export default function Dashboard({
   schedule,
   onTalkToAI,
   onSelectMedicine,
+  activeNavItem,
+  onNavSelect,
 }) {
   const [{ year, month }, setCursor] = useState({ year: 2022, month: 4 })
   const [selectedDay, setSelectedDay] = useState(10)
-  const [activeNavItem,setActiveNavItem] = useState('Home')
 
   const goPrevMonth = () =>
     setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))
@@ -35,14 +36,14 @@ export default function Dashboard({
           <Navbar
             items={['Home', 'Prescriptions', 'Hospitals', 'MindSpace']}
             activeItem={activeNavItem}
-            onSelect={setActiveNavItem}
+            onSelect={onNavSelect}
           />
         </div>
         <div className="lg:hidden">
           <MobileNav
             items={['Home', 'Prescriptions', 'Hospitals', 'MindSpace']}
             activeItem={activeNavItem}
-            onSelect={setActiveNavItem}
+            onSelect={onNavSelect}
           />
         </div>
       </div>
