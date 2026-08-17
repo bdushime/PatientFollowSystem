@@ -4,15 +4,28 @@ import Navbar from '../../components/ui/Navbar'
 import MobileNav from '../../components/ui/MobileNav'
 import PatternBackground from '../../components/ui/PatternBackground'
 import PatientCard from '../../components/doctor/PatientCard'
+import Calendar from '../../components/patient/Calendar'
 import { mockDoctor, mockPatients } from '../../data/mockDoctorData'
 
-const NAV_ITEMS = ['Patients']
+const NAV_ITEMS = ['Patients', 'Alerts', 'Schedule']
 
 export default function DoctorDashboard() {
   const [activeNavItem, setActiveNavItem] = useState('Patients')
+  const [{ year, month }, setCursor] = useState({ year: 2026, month: 7 })
+  const [selectedDay, setSelectedDay] = useState(16)
   const navigate = useNavigate()
 
-  const alertCount = mockPatients.filter((p) => p.hasAlert).length
+  const alertPatients = mockPatients.filter((p) => p.hasAlert)
+  const alertCount = alertPatients.length
+
+  const goPrevMonth = () =>
+    setCursor((c) =>
+      c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }
+    )
+  const goNextMonth = () =>
+    setCursor((c) =>
+      c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }
+    )
 
   return (
     <div className="relative overflow-hidden bg-bg min-h-svh">
@@ -73,25 +86,72 @@ export default function DoctorDashboard() {
         </div>
       </div>
 
-      {/* Patient List */}
-      <div className="relative max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 pt-8 pb-12">
-        <p className="text-text-primary font-semibold text-lg md:text-xl mb-5">
-          Your Patients
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {mockPatients.map((patient) => (
-            <PatientCard
-              key={patient.id}
-              name={patient.name}
-              condition={patient.condition}
-              hospitalPatientId={patient.hospitalPatientId}
-              adherenceRate={patient.adherenceRate}
-              hasAlert={patient.hasAlert}
-              onClick={() => navigate(`/doctor/patient/${patient.id}`)}
-            />
-          ))}
+      {/* Tab: Patients */}
+      {activeNavItem === 'Patients' && (
+        <div className="relative max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 pt-8 pb-12">
+          <p className="text-text-primary font-semibold text-lg md:text-xl mb-5">
+            Your Patients
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {mockPatients.map((patient) => (
+              <PatientCard
+                key={patient.id}
+                name={patient.name}
+                condition={patient.condition}
+                hospitalPatientId={patient.hospitalPatientId}
+                adherenceRate={patient.adherenceRate}
+                hasAlert={patient.hasAlert}
+                onClick={() => navigate(`/doctor/patient/${patient.id}`)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Tab: Alerts */}
+      {activeNavItem === 'Alerts' && (
+        <div className="relative max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 pt-8 pb-12">
+          <p className="text-text-primary font-semibold text-lg md:text-xl mb-5">
+            Patients Needing Attention
+          </p>
+          {alertPatients.length === 0 ? (
+            <p className="text-text-muted">No alerts right now — everyone's on track.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {alertPatients.map((patient) => (
+                <PatientCard
+                  key={patient.id}
+                  name={patient.name}
+                  condition={patient.condition}
+                  hospitalPatientId={patient.hospitalPatientId}
+                  adherenceRate={patient.adherenceRate}
+                  hasAlert={patient.hasAlert}
+                  onClick={() => navigate(`/doctor/patient/${patient.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Schedule */}
+      {activeNavItem === 'Schedule' && (
+        <div className="relative max-w-[1600px] mx-auto px-5 md:px-10 lg:px-16 pt-8 pb-12">
+          <p className="text-text-primary font-semibold text-lg md:text-xl mb-5">
+            Your Schedule
+          </p>
+          <div className="max-w-md">
+            <Calendar
+              year={year}
+              month={month}
+              selectedDay={selectedDay}
+              onSelectDay={setSelectedDay}
+              onPrevMonth={goPrevMonth}
+              onNextMonth={goNextMonth}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

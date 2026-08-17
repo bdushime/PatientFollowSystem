@@ -29,14 +29,14 @@ const schedule = [
     drugName: 'Metformin 500mg',
     instructions: 'With breakfast',
     status: 'taken',
-    medecine: medications[0],
+    medicine: medications[0],
   },
   {
     time: '7:00 PM',
     drugName: 'Metformin 500mg',
     instructions: 'With dinner',
     status: 'upcoming',
-    medecine: medications[1],
+    medicine: medications[1],
   },
 ]
 

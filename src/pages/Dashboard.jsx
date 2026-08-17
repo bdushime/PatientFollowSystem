@@ -23,8 +23,6 @@ export default function Dashboard({
   hospitals = [],
   onTalkToAI,
   onSelectMedicine,
-  activeNavItem,
-  onNavSelect,
 }) {
   const [{ year, month }, setCursor] = useState({ year: 2026, month: 7 })
   const [selectedDay, setSelectedDay] = useState(16)
@@ -54,18 +52,6 @@ export default function Dashboard({
         </div>
         <div className="lg:hidden">
           <MobileNav items={NAV_ITEMS} activeItem={activeNavItem} onSelect={handleNavSelect} />
-          <Navbar
-            items={['Home', 'Prescriptions', 'Hospitals', 'MindSpace']}
-            activeItem={activeNavItem}
-            onSelect={onNavSelect}
-          />
-        </div>
-        <div className="lg:hidden">
-          <MobileNav
-            items={['Home', 'Prescriptions', 'Hospitals', 'MindSpace']}
-            activeItem={activeNavItem}
-            onSelect={onNavSelect}
-          />
         </div>
       </div>
 
@@ -190,9 +176,7 @@ export default function Dashboard({
               {hospitals.map((h, i) => (
                 <HospitalCard
                   key={i}
-                  name={h.name}
-                  hospitalPatientId={h.hospitalPatientId}
-                  status={h.status}
+                  {...h}
                   onClick={() => console.log('hospital detail')}
                 />
               ))}
