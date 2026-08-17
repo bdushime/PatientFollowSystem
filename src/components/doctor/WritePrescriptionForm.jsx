@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
+import { createPrescription } from '../../api/prescriptions'
 
 const EMPTY_FORM = {
   drugName: '',
@@ -20,17 +21,36 @@ const labelClass = 'text-text-muted text-xs uppercase tracking-wide'
 
 export default function WritePrescriptionForm({ patientId, onCancel, onSubmit }) {
   const [form, setForm] = useState(EMPTY_FORM)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: replace with POST /api/prescriptions when backend is ready
-    console.log('Submitting prescription for patient', patientId, form)
-    onSubmit?.(form)
+    setSubmitting(true)
+    setError(null)
+    try {
+      const created = await createPrescription({
+        patientId,
+        drugName: form.drugName,
+        dosage: form.dosage,
+        frequency: form.frequency,
+        quantity: form.quantity,
+        refills: form.refills,
+        startDate: form.startDate,
+        instructions: form.instructions,
+        ...(form.doctorNotes ? { doctorNotes: form.doctorNotes } : {}),
+      })
+      onSubmit?.(created)
+    } catch (err) {
+      setError(err.message || 'Failed to save the prescription. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -148,12 +168,14 @@ export default function WritePrescriptionForm({ patientId, onCancel, onSubmit })
           />
         </div>
 
+        {error && <p className="text-warning text-sm">{error}</p>}
+
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 pt-1">
-          <Button type="submit" variant="primary" className="flex-1">
-            Save Prescription
+          <Button type="submit" variant="primary" className="flex-1" disabled={submitting}>
+            {submitting ? 'Saving…' : 'Save Prescription'}
           </Button>
-          <Button type="button" variant="secondary" className="flex-1" onClick={onCancel}>
+          <Button type="button" variant="secondary" className="flex-1" onClick={onCancel} disabled={submitting}>
             Cancel
           </Button>
         </div>

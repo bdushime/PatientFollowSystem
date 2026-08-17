@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-export default function ChatInput({ onSend }) {
+export default function ChatInput({ onSend, disabled = false }) {
   const [value, setValue] = useState('')
 
   const handleSend = () => {
-    if (!value.trim()) return
+    if (!value.trim() || disabled) return
     onSend?.(value.trim())
     setValue('')
   }
@@ -16,12 +16,14 @@ export default function ChatInput({ onSend }) {
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
         placeholder="Type your response..."
-        className="flex-1 bg-transparent text-text-primary text-sm placeholder:text-text-muted outline-none"
+        disabled={disabled}
+        className="flex-1 bg-transparent text-text-primary text-sm placeholder:text-text-muted outline-none disabled:opacity-60"
       />
       <button
         onClick={handleSend}
+        disabled={disabled}
         aria-label="Send"
-        className="w-9 h-9 shrink-0 rounded-full bg-accent hover:bg-accent-hover text-white flex items-center justify-center cursor-pointer"
+        className="w-9 h-9 shrink-0 rounded-full bg-accent hover:bg-accent-hover text-white flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
       >
         ↑
       </button>

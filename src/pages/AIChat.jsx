@@ -1,20 +1,44 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ChatBubble from '../components/patient/ChatBubble'
 import ChatInput from '../components/patient/ChatInput'
+import TypingIndicator from '../components/patient/TypingIndicator'
+import { sendChatMessage } from '../api/chat'
 
-const initialMessages = [
-  {
-    sender: 'ai',
-    text: 'Hello John. According to your prescription, you should be on Day 3. Have you taken your morning dose?',
-    options: ['Yes', 'No'],
-  },
-]
+const FALLBACK_MESSAGE = {
+  sender: 'ai',
+  text: 'Hello! Have you taken your medication as scheduled today?',
+  options: ['Yes', 'No'],
+}
 
-export default function AIChat({ onBack }) {
-  const [messages, setMessages] = useState(initialMessages)
+export default function AIChat({ patientId, initialMessages, onBack }) {
+  const [messages, setMessages] = useState(
+    initialMessages?.length ? initialMessages : [FALLBACK_MESSAGE],
+  )
+  const [sending, setSending] = useState(false)
+  const bottomRef = useRef(null)
 
-  const addMessage = (text) => {
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, sending])
+
+  const addMessage = async (text) => {
+    if (sending) return
     setMessages((prev) => [...prev, { sender: 'patient', text }])
+    setSending(true)
+    try {
+      const { reply, hasAlert } = await sendChatMessage(patientId, text)
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'ai', text: reply, ...(hasAlert ? {} : { options: ['Yes', 'No'] }) },
+      ])
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'ai', text: err.message || 'Something went wrong sending that. Please try again.' },
+      ])
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -37,14 +61,17 @@ export default function AIChat({ onBack }) {
             sender={message.sender}
             text={message.text}
             options={message.options}
+            optionsDisabled={sending}
             onOptionClick={addMessage}
           />
         ))}
+        {sending && <TypingIndicator />}
+        <div ref={bottomRef} />
       </div>
 
       <div className="px-5 py-4 border-t border-border bg-surface">
         <div className="max-w-2xl w-full mx-auto">
-          <ChatInput onSend={addMessage} />
+          <ChatInput onSend={addMessage} disabled={sending} />
         </div>
       </div>
     </div>

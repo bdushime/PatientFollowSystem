@@ -1,8 +1,24 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PatternBackground from '../components/ui/PatternBackground'
+import { getOrCreateDemoPatientId } from '../api/demoPatient'
 
 export default function EntryPage() {
   const navigate = useNavigate()
+  const [entering, setEntering] = useState(false)
+  const [error, setError] = useState(null)
+
+  const handlePatientEntry = async () => {
+    setError(null)
+    setEntering(true)
+    try {
+      const patientId = await getOrCreateDemoPatientId()
+      navigate(`/patient/${patientId}`)
+    } catch (err) {
+      setError(err.message || 'Could not reach the server. Is the backend running?')
+      setEntering(false)
+    }
+  }
 
   return (
     <div className="relative min-h-svh bg-bg flex flex-col items-center justify-center px-5">
@@ -23,8 +39,9 @@ export default function EntryPage() {
       <div className="relative w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Patient card */}
         <button
-          onClick={() => navigate('/patient')}
-          className="group relative overflow-hidden bg-surface border border-border rounded-3xl p-8 text-left shadow-sm hover:border-accent/40 hover:shadow-md transition-all cursor-pointer"
+          onClick={handlePatientEntry}
+          disabled={entering}
+          className="group relative overflow-hidden bg-surface border border-border rounded-3xl p-8 text-left shadow-sm hover:border-accent/40 hover:shadow-md transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <PatternBackground color="accent" className="opacity-0 group-hover:opacity-5 transition-opacity" />
           <div className="relative flex flex-col h-full">
@@ -38,7 +55,7 @@ export default function EntryPage() {
               View your prescriptions, medication schedule, and check in with your AI assistant.
             </p>
             <p className="text-accent font-semibold text-sm mt-5 flex items-center gap-1">
-              Enter patient portal <span aria-hidden="true">›</span>
+              {entering ? 'Loading…' : 'Enter patient portal'} <span aria-hidden="true">›</span>
             </p>
           </div>
         </button>
@@ -65,6 +82,10 @@ export default function EntryPage() {
           </div>
         </button>
       </div>
+
+      {error && (
+        <p className="relative text-warning text-sm mt-6 max-w-md text-center">{error}</p>
+      )}
     </div>
   )
 }

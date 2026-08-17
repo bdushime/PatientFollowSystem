@@ -1,84 +1,124 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import Dashboard from './Dashboard'
 import AIChat from './AIChat'
+import MedicineDetail from './MedicineDetail'
+import { getPatientDetail } from '../api/patients'
+import { getDoctorMe } from '../api/doctor'
 
-const medications = [
-  {
-    drugName: 'Metformin',
-    image: '/tablet-amoxy.png',
+function buildMedications(detail) {
+  if (!detail.prescription || !detail.schedule?.length) return []
+  const total = detail.schedule.length
+  const taken = detail.schedule.filter((slot) => slot.status === 'taken').length
+
+  return detail.schedule.map((slot, i) => ({
+    drugName: detail.prescription.drugName,
+    image: i % 2 === 0 ? '/tablet-amoxy.png' : '/tablet.png',
     dose: '1',
-    doseUnit: 'tablet',
-    time: '8:00 AM',
-    timesTaken: 1,
-    timesTotal: 2,
-  },
-  {
-    drugName: 'Metformin',
-    image: '/tablet.png',
-    dose: '1',
-    doseUnit: 'tablet',
-    time: '7:00 PM',
-    timesTaken: 0,
-    timesTotal: 2,
-  },
-]
-
-const schedule = [
-  {
-    time: '8:00 AM',
-    drugName: 'Metformin 500mg',
-    instructions: 'With breakfast',
-    status: 'taken',
-    medicine: medications[0],
-  },
-  {
-    time: '7:00 PM',
-    drugName: 'Metformin 500mg',
-    instructions: 'With dinner',
-    status: 'upcoming',
-    medicine: medications[1],
-  },
-]
-
-// TODO: replace with GET /api/patients/:id/prescriptions
-const prescriptions = [
-  {
-    drugName: 'Metformin',
-    dosage: '500mg · 2x daily',
-    refillsLeft: 2,
-    quantity: 60,
-    nextPickupDate: '2026-08-31',
-  },
-]
-
-// TODO: replace with GET /api/patients/:id/hospitals
-const hospitals = [
-  {
-    name: 'City General Hospital',
-    hospitalPatientId: 'CGH-4821',
-    status: 'approved',
-  },
-]
+    doseUnit: 'dose',
+    time: slot.time,
+    timesTaken: taken,
+    timesTotal: total,
+  }))
+}
 
 export default function PatientRoot() {
+  const { patientId } = useParams()
+  const [detail, setDetail] = useState(null)
+  const [doctor, setDoctor] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [showChat, setShowChat] = useState(false)
+  const [selectedMedicine, setSelectedMedicine] = useState(null)
+
+  useEffect(() => {
+    let ignore = false
+
+    Promise.all([getPatientDetail(patientId), getDoctorMe()])
+      .then(([detailRes, doctorRes]) => {
+        if (ignore) return
+        setDetail(detailRes)
+        setDoctor(doctorRes)
+      })
+      .catch((err) => {
+        if (!ignore) setError(err.message || 'Failed to load your data.')
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [patientId])
+
+  if (loading) {
+    return (
+      <div className="min-h-svh bg-bg flex items-center justify-center">
+        <p className="text-text-secondary">Loading your dashboard…</p>
+      </div>
+    )
+  }
+
+  if (error || !detail) {
+    return (
+      <div className="min-h-svh bg-bg flex items-center justify-center px-5">
+        <p className="text-warning text-center">{error || 'Patient not found.'}</p>
+      </div>
+    )
+  }
 
   if (showChat) {
-    return <AIChat onBack={() => setShowChat(false)} />
+    return (
+      <AIChat
+        patientId={patientId}
+        initialMessages={detail.aiResponses}
+        onBack={() => setShowChat(false)}
+      />
+    )
   }
+
+  if (selectedMedicine) {
+    const rx = detail.prescription
+    return (
+      <div className="min-h-svh bg-bg flex items-center justify-center px-5">
+        <MedicineDetail
+          drugName={selectedMedicine.drugName}
+          image={selectedMedicine.image}
+          dosage={rx?.dosage}
+          instructions={rx?.instructions}
+          sideEffects="Not reported."
+          doctorNotes={rx?.doctorNotes}
+          onBack={() => setSelectedMedicine(null)}
+        />
+      </div>
+    )
+  }
+
+  const medications = buildMedications(detail)
+  const schedule = detail.schedule.map((slot, i) => ({ ...slot, medicine: medications[i] }))
+  const prescriptions = detail.prescription ? [detail.prescription] : []
+  const hospitals = [
+    {
+      name: detail.hospital,
+      hospitalPatientId: detail.hospitalPatientId,
+      doctorName: doctor?.name,
+      status: 'approved',
+    },
+  ]
 
   return (
     <Dashboard
-      patientName="John"
-      hospitalName="City General Hospital"
-      doctorName="Dr. Beni"
-      hospitalPatientId="CGH-4821"
+      patientName={detail.name}
+      hospitalName={detail.hospital}
+      doctorName={doctor?.name}
+      hospitalPatientId={detail.hospitalPatientId}
       medications={medications}
       schedule={schedule}
       prescriptions={prescriptions}
       hospitals={hospitals}
       onTalkToAI={() => setShowChat(true)}
-      onSelectMedicine={() => console.log('open detail')}
+      onSelectMedicine={setSelectedMedicine}
     />
   )
 }

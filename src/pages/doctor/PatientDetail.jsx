@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { mockPatients } from '../../data/mockDoctorData'
+import { getPatientDetail } from '../../api/patients'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Calendar from '../../components/patient/Calendar'
@@ -13,12 +13,28 @@ export default function PatientDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const patient = mockPatients.find((p) => p.id === id)
+  const [patient, setPatient] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const [{ year, month }, setCursor] = useState({ year: 2026, month: 7 })
   const [selectedDay, setSelectedDay] = useState(16)
   const [showForm, setShowForm] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+
+  const loadPatient = useCallback(() => {
+    return getPatientDetail(id)
+      .then((data) => {
+        setPatient(data)
+        setError(null)
+      })
+      .catch((err) => setError(err.message || 'Failed to load patient.'))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  useEffect(() => {
+    loadPatient()
+  }, [loadPatient])
 
   useEffect(() => {
     if (!showSuccess) return
@@ -29,6 +45,7 @@ export default function PatientDetail() {
   const handlePrescriptionSubmit = () => {
     setShowForm(false)
     setShowSuccess(true)
+    loadPatient()
   }
 
   const goPrevMonth = () =>
@@ -40,10 +57,18 @@ export default function PatientDetail() {
       c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }
     )
 
-  if (!patient) {
+  if (loading) {
     return (
       <div className="min-h-svh bg-bg flex items-center justify-center">
-        <p className="text-text-secondary">Patient not found.</p>
+        <p className="text-text-secondary">Loading patient…</p>
+      </div>
+    )
+  }
+
+  if (error || !patient) {
+    return (
+      <div className="min-h-svh bg-bg flex items-center justify-center">
+        <p className="text-warning">{error || 'Patient not found.'}</p>
       </div>
     )
   }
@@ -86,50 +111,58 @@ export default function PatientDetail() {
             <Card>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-text-primary font-semibold text-lg">Current Prescription</p>
-                <span className="text-xs font-semibold text-accent bg-accent-soft rounded-full px-2.5 py-1">
-                  Active
-                </span>
+                {prescription && (
+                  <span className="text-xs font-semibold text-accent bg-accent-soft rounded-full px-2.5 py-1">
+                    Active
+                  </span>
+                )}
               </div>
 
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-accent-soft flex items-center justify-center text-lg shrink-0">
-                  💊
-                </div>
-                <div>
-                  <p className="text-text-primary font-semibold">{prescription.drugName}</p>
-                  <p className="text-text-secondary text-sm">{prescription.dosage}</p>
-                </div>
-              </div>
+              {!prescription ? (
+                <p className="text-text-muted text-sm">No active prescription yet.</p>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-accent-soft flex items-center justify-center text-lg shrink-0">
+                      💊
+                    </div>
+                    <div>
+                      <p className="text-text-primary font-semibold">{prescription.drugName}</p>
+                      <p className="text-text-secondary text-sm">{prescription.dosage}</p>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
-                <div>
-                  <p className="text-text-muted text-xs uppercase tracking-wide">Frequency</p>
-                  <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.frequency}</p>
-                </div>
-                <div>
-                  <p className="text-text-muted text-xs uppercase tracking-wide">Quantity</p>
-                  <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.quantity} units</p>
-                </div>
-                <div>
-                  <p className="text-text-muted text-xs uppercase tracking-wide">Refills left</p>
-                  <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.refillsLeft}</p>
-                </div>
-                <div>
-                  <p className="text-text-muted text-xs uppercase tracking-wide">Next pickup</p>
-                  <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.nextPickupDate}</p>
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
+                    <div>
+                      <p className="text-text-muted text-xs uppercase tracking-wide">Frequency</p>
+                      <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.frequency}</p>
+                    </div>
+                    <div>
+                      <p className="text-text-muted text-xs uppercase tracking-wide">Quantity</p>
+                      <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.quantity} units</p>
+                    </div>
+                    <div>
+                      <p className="text-text-muted text-xs uppercase tracking-wide">Refills left</p>
+                      <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.refillsLeft}</p>
+                    </div>
+                    <div>
+                      <p className="text-text-muted text-xs uppercase tracking-wide">Next pickup</p>
+                      <p className="text-text-primary font-medium text-sm mt-0.5">{prescription.nextPickupDate}</p>
+                    </div>
+                  </div>
 
-              <div className="border-t border-border mt-4 pt-4 flex flex-col gap-3">
-                <div>
-                  <p className="text-text-muted text-xs uppercase tracking-wide">Instructions</p>
-                  <p className="text-text-primary text-sm mt-0.5">{prescription.instructions}</p>
-                </div>
-                <div>
-                  <p className="text-text-muted text-xs uppercase tracking-wide">Doctor's notes</p>
-                  <p className="text-text-primary text-sm mt-0.5">{prescription.doctorNotes}</p>
-                </div>
-              </div>
+                  <div className="border-t border-border mt-4 pt-4 flex flex-col gap-3">
+                    <div>
+                      <p className="text-text-muted text-xs uppercase tracking-wide">Instructions</p>
+                      <p className="text-text-primary text-sm mt-0.5">{prescription.instructions}</p>
+                    </div>
+                    <div>
+                      <p className="text-text-muted text-xs uppercase tracking-wide">Doctor's notes</p>
+                      <p className="text-text-primary text-sm mt-0.5">{prescription.doctorNotes}</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </Card>
 
             {/* AI Follow-up Responses */}
@@ -137,15 +170,19 @@ export default function PatientDetail() {
               <p className="text-text-primary font-semibold text-lg mb-4">
                 AI Follow-up Responses
               </p>
-              <div className="flex flex-col gap-3">
-                {patient.aiResponses.map((msg, i) => (
-                  <ChatBubble
-                    key={i}
-                    sender={msg.sender}
-                    text={msg.text}
-                  />
-                ))}
-              </div>
+              {patient.aiResponses.length === 0 ? (
+                <p className="text-text-muted text-sm">No check-ins yet.</p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {patient.aiResponses.map((msg, i) => (
+                    <ChatBubble
+                      key={i}
+                      sender={msg.sender}
+                      text={msg.text}
+                    />
+                  ))}
+                </div>
+              )}
             </Card>
 
             {/* Write Prescription */}
@@ -185,22 +222,25 @@ export default function PatientDetail() {
               onSelectDay={setSelectedDay}
               onPrevMonth={goPrevMonth}
               onNextMonth={goNextMonth}
-              markedDays={patient.adherenceDays}
             />
 
             <Card>
               <p className="text-text-primary font-semibold mb-3">Today's Schedule</p>
-              <div className="divide-y divide-border">
-                {patient.schedule.map((item, i) => (
-                  <DoseScheduleItem
-                    key={i}
-                    time={item.time}
-                    drugName={item.drugName}
-                    instructions={item.instructions}
-                    status={item.status}
-                  />
-                ))}
-              </div>
+              {patient.schedule.length === 0 ? (
+                <p className="text-text-muted text-sm">No doses scheduled today.</p>
+              ) : (
+                <div className="divide-y divide-border">
+                  {patient.schedule.map((item, i) => (
+                    <DoseScheduleItem
+                      key={i}
+                      time={item.time}
+                      drugName={item.drugName}
+                      instructions={item.instructions}
+                      status={item.status}
+                    />
+                  ))}
+                </div>
+              )}
             </Card>
           </div>
 

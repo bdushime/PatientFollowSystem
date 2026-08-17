@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/ui/Navbar'
 import MobileNav from '../../components/ui/MobileNav'
 import PatternBackground from '../../components/ui/PatternBackground'
 import PatientCard from '../../components/doctor/PatientCard'
 import Calendar from '../../components/patient/Calendar'
-import { mockDoctor, mockPatients } from '../../data/mockDoctorData'
+import { getDoctorMe, getDoctorPatients } from '../../api/doctor'
 
 const NAV_ITEMS = ['Patients', 'Alerts', 'Schedule']
 
@@ -13,9 +13,32 @@ export default function DoctorDashboard() {
   const [activeNavItem, setActiveNavItem] = useState('Patients')
   const [{ year, month }, setCursor] = useState({ year: 2026, month: 7 })
   const [selectedDay, setSelectedDay] = useState(16)
+  const [doctor, setDoctor] = useState(null)
+  const [patients, setPatients] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
 
-  const alertPatients = mockPatients.filter((p) => p.hasAlert)
+  useEffect(() => {
+    let ignore = false
+    Promise.all([getDoctorMe(), getDoctorPatients()])
+      .then(([doctorRes, patientsRes]) => {
+        if (ignore) return
+        setDoctor(doctorRes)
+        setPatients(patientsRes)
+      })
+      .catch((err) => {
+        if (!ignore) setError(err.message || 'Failed to load your dashboard.')
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
+    return () => {
+      ignore = true
+    }
+  }, [])
+
+  const alertPatients = patients.filter((p) => p.hasAlert)
   const alertCount = alertPatients.length
 
   const goPrevMonth = () =>
@@ -26,6 +49,22 @@ export default function DoctorDashboard() {
     setCursor((c) =>
       c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }
     )
+
+  if (loading) {
+    return (
+      <div className="min-h-svh bg-bg flex items-center justify-center">
+        <p className="text-text-secondary">Loading your dashboard…</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-svh bg-bg flex items-center justify-center px-5">
+        <p className="text-warning text-center">{error}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="relative overflow-hidden bg-bg min-h-svh">
@@ -60,10 +99,10 @@ export default function DoctorDashboard() {
               Welcome,
             </p>
             <p className="text-accent font-extrabold text-5xl md:text-7xl lg:text-8xl leading-[0.95]">
-              {mockDoctor.name}
+              {doctor?.name}
             </p>
             <p className="text-text-secondary text-sm md:text-base mt-3">
-              {mockDoctor.specialty}
+              {doctor?.specialty}
             </p>
 
             {alertCount > 0 && (
@@ -92,19 +131,23 @@ export default function DoctorDashboard() {
           <p className="text-text-primary font-semibold text-lg md:text-xl mb-5">
             Your Patients
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {mockPatients.map((patient) => (
-              <PatientCard
-                key={patient.id}
-                name={patient.name}
-                condition={patient.condition}
-                hospitalPatientId={patient.hospitalPatientId}
-                adherenceRate={patient.adherenceRate}
-                hasAlert={patient.hasAlert}
-                onClick={() => navigate(`/doctor/patient/${patient.id}`)}
-              />
-            ))}
-          </div>
+          {patients.length === 0 ? (
+            <p className="text-text-muted">No patients yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {patients.map((patient) => (
+                <PatientCard
+                  key={patient.id}
+                  name={patient.name}
+                  condition={patient.condition}
+                  hospitalPatientId={patient.hospitalPatientId}
+                  adherenceRate={patient.adherenceRate}
+                  hasAlert={patient.hasAlert}
+                  onClick={() => navigate(`/doctor/patient/${patient.id}`)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

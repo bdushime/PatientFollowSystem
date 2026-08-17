@@ -1,4 +1,4 @@
-export default function ChatBubble({ sender, text, options, onOptionClick }) {
+export default function ChatBubble({ sender, text, options, onOptionClick, optionsDisabled }) {
   const isAI = sender === 'ai'
 
   return (
@@ -20,7 +20,8 @@ export default function ChatBubble({ sender, text, options, onOptionClick }) {
               <button
                 key={option}
                 onClick={() => onOptionClick?.(option)}
-                className="rounded-full border border-accent text-accent text-sm font-semibold px-4 py-1.5 cursor-pointer hover:bg-accent-soft"
+                disabled={optionsDisabled}
+                className="rounded-full border border-accent text-accent text-sm font-semibold px-4 py-1.5 cursor-pointer hover:bg-accent-soft disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               >
                 {option}
               </button>
