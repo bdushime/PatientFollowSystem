@@ -71,7 +71,15 @@ export default function DoctorDashboard() {
       <PatternBackground color="accent" className="opacity-10" />
 
       {/* Navbar */}
-      <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-between lg:justify-start items-center">
+      <div className="px-5 md:px-10 lg:px-16 pt-4 flex justify-between items-center">
+        <button
+          onClick={() => navigate('/')}
+          aria-label="Back"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-accent-soft flex items-center justify-center text-text-secondary cursor-pointer shrink-0"
+        >
+          ‹
+        </button>
+
         <div className="hidden lg:block">
           <Navbar
             items={NAV_ITEMS}

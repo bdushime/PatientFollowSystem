@@ -14,6 +14,8 @@ export default function DoseChecklist({
 }) {
   const [taken, setTaken] = useState(false)
 
+  const displayedTimesTaken = taken ? Math.min(timesTaken + 1, timesTotal) : timesTaken
+
   return (
     <div className="w-full rounded-3xl overflow-hidden shadow-md bg-surface">
       <div
@@ -59,11 +61,11 @@ export default function DoseChecklist({
         </div>
         <div className="text-center px-1">
           <p className="text-text-primary font-semibold text-sm whitespace-nowrap">{time}</p>
-          <p className="text-text-secondary text-xs mt-0.5">Time to take</p>
+          <p className="text-text-secondary text-xs mt-0.5">{taken ? 'Taken at' : 'Time to take'}</p>
         </div>
         <div className="text-center px-1">
           <p className="text-text-primary font-semibold text-sm whitespace-nowrap">
-            {timesTaken}/{timesTotal}
+            {displayedTimesTaken}/{timesTotal}
           </p>
           <p className="text-text-secondary text-xs mt-0.5">Number of times</p>
         </div>
